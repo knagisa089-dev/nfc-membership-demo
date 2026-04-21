@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Customer {
+  id           String        @id @default(cuid())
+  name         String
+  email        String?
+  phone        String?
+  note         String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  nfcTag       NfcTag?
+  subscription Subscription?
+}
+
+model NfcTag {
+  id           String   @id @default(cuid())
+  uid          String   @unique
+  customerId   String   @unique
+  customer     Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  registeredAt DateTime @default(now())
+}
+
+model Subscription {
+  id         String   @id @default(cuid())
+  customerId String   @unique
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  status     Status   @default(ACTIVE)
+  startDate  DateTime @default(now())
+  expiresAt  DateTime
+  updatedAt  DateTime @updatedAt
+}
+
+model ScanLog {
+  id        String   @id @default(cuid())
+  nfcUid    String
+  result    String
+  scannedAt DateTime @default(now())
+}
+
+enum Status {
+  ACTIVE
+  EXPIRED
+  SUSPENDED
+}
