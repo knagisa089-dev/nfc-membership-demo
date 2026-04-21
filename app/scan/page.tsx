@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 type Result = {
@@ -12,7 +12,7 @@ type Result = {
   }
 }
 
-export default function ScanPage() {
+function ScanContent() {
   const searchParams = useSearchParams()
   const uid = searchParams.get('uid')
   const [data, setData] = useState<Result | null>(null)
@@ -67,7 +67,6 @@ export default function ScanPage() {
         }`}>
           {isActive ? '✓' : '✗'}
         </div>
-
         <h1 className={`text-3xl font-bold mb-2 ${
           isActive ? 'text-green-700' :
           isExpired ? 'text-red-700' :
@@ -79,7 +78,6 @@ export default function ScanPage() {
            isSuspended ? '利用停止中' :
            '未登録のタグ'}
         </h1>
-
         {data?.customer && (
           <div className="bg-white rounded-xl p-6 border border-gray-200 mt-6 text-left">
             <p className="font-semibold text-gray-800 text-lg">{data.customer.name}</p>
@@ -93,11 +91,22 @@ export default function ScanPage() {
             )}
           </div>
         )}
-
         <a href="/" className="inline-block mt-8 text-sm text-gray-400 hover:text-gray-600">
           管理画面に戻る
         </a>
       </div>
     </main>
+  )
+}
+
+export default function ScanPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-400">読み込み中...</p>
+      </main>
+    }>
+      <ScanContent />
+    </Suspense>
   )
 }
