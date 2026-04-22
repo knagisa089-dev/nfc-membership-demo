@@ -1,16 +1,14 @@
 import { NextResponse } from 'next/server'
 
-const PASSWORD = process.env.APP_PASSWORD ?? 'demo1234'
-
 export async function POST(request: Request) {
   const body = await request.json()
 
-  if (body.password !== PASSWORD) {
+  if (body.password !== 'demo1234') {
     return NextResponse.json({ error: 'Wrong password' }, { status: 401 })
   }
 
   const response = NextResponse.json({ ok: true })
-  response.cookies.set('auth', PASSWORD, {
+  response.cookies.set('auth', 'demo1234', {
     httpOnly: true,
     secure: true,
     maxAge: 60 * 60 * 24 * 30,
