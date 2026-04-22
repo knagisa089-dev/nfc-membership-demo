@@ -6,9 +6,12 @@ import { useRouter } from 'next/navigation'
 export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState(false)
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
 
   const login = async () => {
+    setLoading(true)
+    setError(false)
     const res = await fetch('/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -18,6 +21,7 @@ export default function LoginPage() {
       router.push('/')
     } else {
       setError(true)
+      setLoading(false)
     }
   }
 
@@ -33,15 +37,17 @@ export default function LoginPage() {
           value={password}
           onChange={e => setPassword(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && login()}
+          autoComplete="current-password"
         />
         {error && (
           <p className="text-red-500 text-xs mb-3">パスワードが違います</p>
         )}
         <button
           onClick={login}
-          className="w-full bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700"
+          disabled={loading || !password}
+          className="w-full bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
         >
-          ログイン
+          {loading ? '確認中...' : 'ログイン'}
         </button>
       </div>
     </main>
